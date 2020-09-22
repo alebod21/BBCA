@@ -1,2 +1,2 @@
 # BBCA
-Chat lient project for Computer Science Senior Capstone
+Chat Client Project for Computer Science Senior Capstone
