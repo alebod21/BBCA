@@ -6,35 +6,35 @@ import java.util.Scanner;
 public class ChatClient {
     private static Socket socket;
     private static PrintWriter out;
-    
-    public static void main(String[] args) throws Exception {
+    private Scanner userInput;
+    private boolean serverAccepted;
 
-        Scanner userInput = new Scanner(System.in);
-        
-        System.out.println("What's the server IP? ");
-        String serverip = userInput.nextLine();
-        System.out.println("What's the server port? ");
-        int port = userInput.nextInt();
-        userInput.nextLine();
-
-        socket = new Socket(serverip, port);
+    public ChatClient(String ip, int port, Scanner userIn) throws Exception{
+        socket = new Socket(ip, port);
         out = new PrintWriter(socket.getOutputStream(), true);
+        userInput = userIn;
+    }
+
+    public void startClient() throws Exception {
 
         // start a thread to listen for server messages
-        ClientServerListener listener = new ClientServerListener(socket);
+        ClientServerListener listener = new ClientServerListener(socket,this);
         Thread t = new Thread(listener);
         t.start();
 
-        //to be rewritten as a server/client communication
-        System.out.print("Chat sessions has started - enter a user name: ");
-        String name = userInput.nextLine().trim();
-        out.println(name); //out.flush();
 
-        //change to allow for other headers as needed
         String line = userInput.nextLine().trim();
         while(!line.toLowerCase().startsWith("/quit")) {
-            String msg = String.format("CHAT %s", line); 
+
+            if(!serverAccepted){
+                out.println(String.format("NAME%s",line));
+            }
+
+            else{
+            String msg = String.format("CHAT%s", line);
             out.println(msg);
+            }
+
             line = userInput.nextLine().trim();
         }
         out.println("QUIT");
@@ -42,5 +42,12 @@ public class ChatClient {
         userInput.close();
         socket.close();
         
+    }
+
+    public void sendName(){
+        serverAccepted = false;
+    }
+    public void nameRecieved(){
+        serverAccepted = true;
     }
 }

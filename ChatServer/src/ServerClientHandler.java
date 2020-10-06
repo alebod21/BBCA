@@ -14,50 +14,74 @@ class ServerClientHandler implements Runnable{
             System.out.println("Broadcasting -- " + msg);
             synchronized (ChatServer.clientList) {
                 for (ClientConnectionData c : ChatServer.clientList){
-                    if(c.equals(client) && !msg.substring(0, 7).equals("WELCOME")) { //Exception for welcome doesn't necessarily need to be here
+                    if(c.getUserName()==null || c.equals(client) && !msg.startsWith("WELCOME")) {
                     } else {
                         c.getOut().println(msg);
                     }
-                    // c.getOut().flush();
                 }
             }
         } catch (Exception ex) {
             System.out.println("broadcast caught exception: " + ex);
             ex.printStackTrace();
         }
-
     }
 
     @Override
     public void run() {
         try {
             BufferedReader in = client.getInput();
-            //get userName, first message from user
-            String userName = in.readLine().trim();
+
+            String userName;
+            boolean nameNotUsed;
+
+            while (true){
+                client.getOut().println("SUBMITNAME");
+                userName = client.getInput().readLine();
+                nameNotUsed = true;
+
+                //regex code borrowed from https://www.techiedelight.com/check-string-contains-alphanumeric-characters-java/
+                if(userName.startsWith("NAME") && userName.length() > 4 && userName.matches("^[a-zA-Z0-9]*$")){
+                    userName = userName.substring(4);
+
+                    synchronized (ChatServer.clientList){
+                    for(ClientConnectionData c : ChatServer.clientList){
+                        if(!c.equals(client) && c.getUserName().equals(userName)){nameNotUsed = false; break;}
+                    }}
+                    if(nameNotUsed)break;
+                }
+            }
+
+            //set client's username and notify client of acceptance
             client.setUserName(userName);
+            client.getOut().print("ACCEPTED");
             //notify all that client has joined
             broadcast(String.format("WELCOME %s", client.getUserName()));
-
 
             String incoming = "";
 
             while( (incoming = in.readLine()) != null) {
+
                 if (incoming.toUpperCase().startsWith("CHAT")) {
                     String chat = incoming.substring(4).trim();
                     if (chat.length() > 0) {
-                        String msg = String.format("CHAT %s %s", client.getUserName(), chat);
+                        String msg = String.format("CHAT %s: %s", client.getUserName(), chat);
                         broadcast(msg);
                     }
-                } else if (incoming.startsWith("QUIT")){
+                }
+
+                else if (incoming.startsWith("QUIT")){
                     break;
                 }
             }
+
+
+
         } catch (Exception ex) {
             if (ex instanceof SocketException) {
                 System.out.println("Caught socket ex for " +
                         client.getName());
             } else {
-                System.out.println(ex);
+                System.out.println(ex.getMessage());
                 ex.printStackTrace();
             }
         } finally {
@@ -70,7 +94,6 @@ class ServerClientHandler implements Runnable{
             try {
                 client.getSocket().close();
             } catch (IOException ex) {}
-
         }
     }
 }

@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -9,11 +10,11 @@ public class ClientConnectionData {
     private String name;
     private String userName;
 
-    public ClientConnectionData(Socket socket, BufferedReader input, PrintWriter out, String name) {
+    public ClientConnectionData(Socket socket) throws Exception{
         this.socket = socket;
-        this.input = input;
-        this.out = out;
-        this.name = name;
+        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.name = socket.getInetAddress().getHostName();
     }
 
     public Socket getSocket() {
