@@ -113,7 +113,6 @@ class ServerClientHandler implements Runnable{
                     }
                 }
 
-
                 else if(incoming.toUpperCase().startsWith("BAN") && incoming.length() > 3){
                     boolean nameexists = false;
 
@@ -127,10 +126,10 @@ class ServerClientHandler implements Runnable{
                     }
 
                     if(!nameexists){
-                        client.getOut().println("SERVERCannot vote to kick; user doesn't exist");
+                        client.getOut().println("SERVERCannot vote to ban; user doesn't exist");
                     }
-                    if(ChatServer.voteInProgress){
-                        client.getOut().println("SERVERCannot vote to kick; vote already in progress.");
+                    else if(ChatServer.voteInProgress){
+                        client.getOut().println("SERVERCannot vote to ban; vote already in progress.");
                     }
                     else{
                         publicBroadcast("KICK"+incoming.substring(3));
