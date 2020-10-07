@@ -12,8 +12,19 @@ import java.io.PrintWriter;
 public class ChatServer {
     public static final int PORT = 54321;
     public static final ArrayList<ClientConnectionData> clientList = new ArrayList<>();
+    //private static final ArrayList<Integer> bannedIPs = new ArrayList<>();
+    protected static final ArrayList<String> bannedNames = new ArrayList<>();
+    public static Boolean voteInProgress = new Boolean(false);
+    public static Integer voteYes = 0;
+    public static Integer voteNo = 0;
+    public static ChatServer theServer;
 
-    public static void main(String[] args) throws Exception {
+    public ChatServer(){
+        if(theServer != null);
+        else theServer = this;
+    }
+
+    public void startServer() throws Exception {
         ExecutorService pool = Executors.newFixedThreadPool(100);
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -46,35 +57,59 @@ public class ChatServer {
         }
     }
 
+    public void startBan(String user){
+        voteKicker kicker = new voteKicker(user);
+        Thread kickThread = new Thread(kicker);
+        kickThread.start();
+    }
+
     class voteKicker implements Runnable{
+
+        private String name;
+        public voteKicker(String name){this.name = name;}
 
         @Override
         public void run() {
             System.out.println("Vote kick started");
             int timeStart = (int)(System.currentTimeMillis()/1000);
-            int yes = 0;
-            int no = 0;
-            int currentUsers = 0;
+            voteNo = 0;
+            voteYes = 0;
+            voteInProgress = true;
 
+            int currentUsers = 0;
             synchronized (clientList){
             currentUsers = clientList.size();
             }
 
-
-
-            while(yes < currentUsers/2 && no < currentUsers/2 && ((int)(System.currentTimeMillis()/1000) - timeStart < 30)){
-
+            while(((int)(System.currentTimeMillis()/1000) - timeStart < 30)){
+                //lol just a countdown, what can ya do?
             }
 
-            if(yes > currentUsers/2){
+            voteInProgress = false;
 
+            if(voteYes > currentUsers/2){
+                ServerClientHandler.publicBroadcast("SERVERVote succeeded, user " + name + " will be banned.");
+                bannedNames.add(name);
+
+                synchronized (clientList){
+                    for(ClientConnectionData c : clientList){
+                        if(c.getUserName().equals(name)){
+                            try{
+                            c.getSocket().close();}catch (Exception ex){}
+                            clientList.remove(c);
+                        }
+                    }
+                }
             }
-            else if(no > currentUsers/2){
-//this is here to supply a delta
+
+            else if(voteNo > currentUsers/2){
+                ServerClientHandler.publicBroadcast("SERVERVote Failed, too many users voted no.");
             }
             else{
-
+                ServerClientHandler.publicBroadcast("SERVERVote Failed, timed out.");
             }
+
+            System.out.println("Vote kick ended.");
         }
     }
 }

@@ -4,9 +4,30 @@ import java.net.SocketException;
 
 class ServerClientHandler implements Runnable{
     ClientConnectionData client;
+    private boolean hasVoted;
 
     ServerClientHandler(ClientConnectionData client) {
         this.client = client;
+    }
+
+    protected void newVote(){
+        hasVoted = false;
+    }
+
+    public static void publicBroadcast(String msg) {
+        try {
+            System.out.println("Broadcasting -- " + msg);
+            synchronized (ChatServer.clientList) {
+                for (ClientConnectionData c : ChatServer.clientList){
+                    if(c.getUserName()!=null) {
+                        c.getOut().println(msg);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("broadcast caught exception: " + ex);
+            ex.printStackTrace();
+        }
     }
 
     public void broadcast(String msg) {
@@ -43,6 +64,11 @@ class ServerClientHandler implements Runnable{
                 if(userName.startsWith("NAME") && userName.length() > 4 && userName.matches("^[a-zA-Z0-9]*$")){
                     userName = userName.substring(4);
 
+                    if(ChatServer.bannedNames.contains(userName)){
+                        client.getOut().println("SERVERThat User has Been Banned.");
+                        nameNotUsed = false;
+                    }
+
                     synchronized (ChatServer.clientList){
                     for(ClientConnectionData c : ChatServer.clientList){
                         if(!c.equals(client) && c.getUserName().equals(userName)){nameNotUsed = false; break;}
@@ -53,7 +79,8 @@ class ServerClientHandler implements Runnable{
 
             //set client's username and notify client of acceptance
             client.setUserName(userName);
-            client.getOut().print("ACCEPTED");
+            client.getOut().println("ACCEPTED");
+            client.getOut().flush();
             //notify all that client has joined
             broadcast(String.format("WELCOME %s", client.getUserName()));
 
@@ -62,6 +89,7 @@ class ServerClientHandler implements Runnable{
             while( (incoming = in.readLine()) != null) {
 
 
+                if(!ChatServer.voteInProgress)newVote();
 
                 if (incoming.toUpperCase().startsWith("CHAT")) {
                     String chat = incoming.substring(4).trim();
@@ -71,13 +99,27 @@ class ServerClientHandler implements Runnable{
                     }
                 }
 
+                else if(!hasVoted && ChatServer.voteInProgress && incoming.equals("VOTEy")){
+                   synchronized (ChatServer.voteYes){
+                       ChatServer.voteYes++;
+                       hasVoted = true;
+                   }
+                }
 
-                else if(incoming.toUpperCase().startsWith("KICK") && incoming.length() > 4){
+                else if(!hasVoted && ChatServer.voteInProgress && incoming.equals("VOTEn")){
+                    synchronized (ChatServer.voteNo){
+                        ChatServer.voteNo++;
+                        hasVoted = true;
+                    }
+                }
+
+
+                else if(incoming.toUpperCase().startsWith("BAN") && incoming.length() > 3){
                     boolean nameexists = false;
 
                     synchronized (ChatServer.clientList){
                         for(ClientConnectionData c : ChatServer.clientList){
-                            if(incoming.substring(4).equals(c.getUserName())){
+                            if(incoming.substring(3).equals(c.getUserName())){
                                 nameexists = true;
                                 break;
                             }
@@ -85,10 +127,14 @@ class ServerClientHandler implements Runnable{
                     }
 
                     if(!nameexists){
-                        client.getOut().print("SERVERCannot vote to kick; user doesn't exist");
+                        client.getOut().println("SERVERCannot vote to kick; user doesn't exist");
+                    }
+                    if(ChatServer.voteInProgress){
+                        client.getOut().println("SERVERCannot vote to kick; vote already in progress.");
                     }
                     else{
-                        broadcast("KICK"+incoming.substring(4));
+                        publicBroadcast("KICK"+incoming.substring(3));
+                        ChatServer.theServer.startBan(incoming.substring(3));
                     }
                 }
 

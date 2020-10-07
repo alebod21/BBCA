@@ -30,6 +30,16 @@ public class ChatClient {
                 out.println(String.format("NAME%s",line));
             }
 
+            else if(line.equals("/y")){
+                out.println("VOTEy");
+            }
+            else if(line.equals("/n")){
+                out.println("VOTEn");
+            }
+            else if(line.startsWith("/ban") && line.length() > 5){
+                out.println("BAN"+line.substring(5));
+            }
+
             else{
             String msg = String.format("CHAT%s", line);
             out.println(msg);
@@ -47,7 +57,7 @@ public class ChatClient {
     public void sendName(){
         serverAccepted = false;
     }
-    public void nameRecieved(){
+    public void nameReceived(){
         serverAccepted = true;
     }
 }

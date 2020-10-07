@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class ClientServerListener implements Runnable {
     private BufferedReader socketIn;
@@ -24,21 +23,21 @@ public class ClientServerListener implements Runnable {
                 if(incoming.startsWith("CHAT")){
                     System.out.println(incoming.substring(4));
                 }
-                if(incoming.startsWith("SERVER")){
+                else if(incoming.startsWith("SERVER")){
                     System.out.println("Server: " + incoming.substring(6));
                 }
-                if(incoming.startsWith("KICK")){
+                else if(incoming.startsWith("KICK")){
                     System.out.println("A vote to kick user: "+incoming.substring(4) + " has begun. You have 30 seconds to vote yes (/y) or no (/n).");
                 }
-                if(incoming.startsWith("SUBMITNAME")){
+                else if(incoming.startsWith("SUBMITNAME")){
                     System.out.print("Chat session has started - enter a user name: ");
                    client.sendName();
                 }
-                if(incoming.startsWith("WELCOME")){
+                else if(incoming.startsWith("WELCOME")){
                     System.out.println(incoming.substring(7) + " has joined.");
                 }
-                if(incoming.startsWith("ACCEPTED")){
-                    client.nameRecieved();
+                else if(incoming.startsWith("ACCEPTED")){
+                    client.nameReceived();
                 }
 
             }
