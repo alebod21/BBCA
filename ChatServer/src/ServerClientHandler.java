@@ -61,11 +61,34 @@ class ServerClientHandler implements Runnable{
 
             while( (incoming = in.readLine()) != null) {
 
+
+
                 if (incoming.toUpperCase().startsWith("CHAT")) {
                     String chat = incoming.substring(4).trim();
                     if (chat.length() > 0) {
                         String msg = String.format("CHAT %s: %s", client.getUserName(), chat);
                         broadcast(msg);
+                    }
+                }
+
+
+                else if(incoming.toUpperCase().startsWith("KICK") && incoming.length() > 4){
+                    boolean nameexists = false;
+
+                    synchronized (ChatServer.clientList){
+                        for(ClientConnectionData c : ChatServer.clientList){
+                            if(incoming.substring(4).equals(c.getUserName())){
+                                nameexists = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(!nameexists){
+                        client.getOut().print("SERVERCannot vote to kick; user doesn't exist");
+                    }
+                    else{
+                        broadcast("KICK"+incoming.substring(4));
                     }
                 }
 

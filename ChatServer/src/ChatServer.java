@@ -45,4 +45,37 @@ public class ChatServer {
             }
         }
     }
+
+    class voteKicker implements Runnable{
+
+        @Override
+        public void run() {
+            System.out.println("Vote kick started");
+            int timeStart = (int)(System.currentTimeMillis()/1000);
+            int yes = 0;
+            int no = 0;
+            int currentUsers = 0;
+
+            synchronized (clientList){
+            currentUsers = clientList.size();
+            }
+
+
+
+            while(yes < currentUsers/2 && no < currentUsers/2 && ((int)(System.currentTimeMillis()/1000) - timeStart < 30)){
+
+            }
+
+            if(yes > currentUsers/2){
+
+            }
+            else if(no > currentUsers/2){
+
+            }
+            else{
+
+            }
+        }
+    }
 }
+
