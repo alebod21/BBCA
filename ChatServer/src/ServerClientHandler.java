@@ -47,6 +47,23 @@ class ServerClientHandler implements Runnable{
         }
     }
 
+    public void privateBroadcast(String msg, String recipient) {
+        try {
+            System.out.println("Broadcasting -- " + msg);
+            synchronized (ChatServer.clientList) {
+                for(ClientConnectionData c : ChatServer.clientList) {
+                    if(c.getUserName().equals(recipient)){
+                        c.getOut().println(msg);
+                    }
+                }
+            }    
+            // client.getOut().println("PRIVATE: " + msg);
+        } catch (Exception ex) {
+            System.out.println("broadcast caught exception: " + ex);
+            ex.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -96,6 +113,15 @@ class ServerClientHandler implements Runnable{
                     if (chat.length() > 0) {
                         String msg = String.format("CHAT %s: %s", client.getUserName(), chat);
                         broadcast(msg);
+                    }
+                }
+
+                else if(incoming.toUpperCase().startsWith("PCHAT")) {
+                    String chat = incoming.substring(5).trim();
+                    String recipient = chat.split(" ")[0];
+                    if (chat.length() > 0) {
+                        String msg = String.format("PCHAT %s: %s", client.getUserName(), chat);
+                        privateBroadcast(msg, recipient);
                     }
                 }
 
