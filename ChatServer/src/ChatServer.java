@@ -70,7 +70,7 @@ public class ChatServer {
 
             }
             else if(no > currentUsers/2){
-
+//this is here to supply a delta
             }
             else{
 
