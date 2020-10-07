@@ -30,7 +30,7 @@ public class ClientServerListener implements Runnable {
                     System.out.println("Server: " + incoming.substring(6));
                 }
                 else if(incoming.startsWith("KICK")){
-                    System.out.println("A vote to kick user: "+incoming.substring(4) + " has begun. You have 30 seconds to vote yes (/y) or no (/n).");
+                    System.out.println("Server: A vote to kick user: "+incoming.substring(4) + " has begun. You have 30 seconds to vote yes (/y) or no (/n).");
                 }
                 else if(incoming.startsWith("SUBMITNAME")){
                     System.out.print("Chat session has started - enter a user name: ");

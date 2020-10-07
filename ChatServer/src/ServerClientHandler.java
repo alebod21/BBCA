@@ -119,8 +119,9 @@ class ServerClientHandler implements Runnable{
                 else if(incoming.toUpperCase().startsWith("PCHAT")) {
                     String chat = incoming.substring(5).trim();
                     String recipient = chat.split(" ")[0];
+                    chat = chat.substring(chat.split(" ")[0].length()+1);
                     if (chat.length() > 0) {
-                        String msg = String.format("PCHAT %s: %s", client.getUserName(), chat);
+                        String msg = String.format("PCHAT %s (private): %s", client.getUserName(), chat);
                         privateBroadcast(msg, recipient);
                     }
                 }
