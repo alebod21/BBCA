@@ -29,7 +29,10 @@ public class ChatClient {
             if(!serverAccepted){
                 out.println(String.format("NAME%s",line));
             }
-
+            else if (line.startsWith("@")) {  
+                String msg = String.format("PCHAT%s", line.substring(1));
+                out.println(msg);
+            }
             else if(line.equals("/y")){
                 out.println("VOTEy");
             }

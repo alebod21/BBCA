@@ -23,6 +23,9 @@ public class ClientServerListener implements Runnable {
                 if(incoming.startsWith("CHAT")){
                     System.out.println(incoming.substring(4));
                 }
+                else if(incoming.startsWith("PCHAT")) {
+                    System.out.println(incoming.substring(5));
+                }
                 else if(incoming.startsWith("SERVER")){
                     System.out.println("Server: " + incoming.substring(6));
                 }
