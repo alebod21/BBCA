@@ -160,7 +160,7 @@ public class ChatClientGuiRunner extends Application{
                     USERS.clear();
 
                     for(int i = 2; i < newnames.length; i++){
-                        USERS.add(newnames[i]);
+                        USERS.add(newnames[i].strip());
                         users.appendText(newnames[i]+"\n");
                     }
                 }

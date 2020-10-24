@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ChatClient {
@@ -30,10 +31,37 @@ public class ChatClient {
             if(!serverAccepted){
                 out.println(String.format("NAME%s",line));
             }
-            else if (line.startsWith("@")) {  
-                String msg = String.format("PCHAT%s", line.substring(1));
-                out.println(msg);
+
+            //pchat
+            else if (line.startsWith("@")) {
+
+                ArrayList<String> pchatNames = new ArrayList<>();
+                String message = "";
+
+                String[] words = line.split(" ");
+                for(int i = 0; i < words.length; i++){
+                    if(words[i].strip().startsWith("@")){
+                        pchatNames.add(words[i].strip().substring(1));
+                    }
+                    else{
+                        for(int r = i; r < words.length; r++){
+                            message += words[r]+" ";
+                        }
+                        break;
+                    }
+                }
+
+                for (String name : pchatNames){
+                    System.out.println(name);
+                }
+
+                for(String name : pchatNames){
+                String msg = String.format("PCHAT%s%s",name,message);
+                out.println("PCHAT"+ name+" " + message);
+                }
             }
+
+
             else if(line.equals("/y")){
                 out.println("VOTEy");
             }
