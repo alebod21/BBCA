@@ -1,16 +1,20 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientServerListener implements Runnable {
     private BufferedReader socketIn;
     private ChatClient client;
+    private PrintStream visibleOut;
 
 
 
-    public ClientServerListener(Socket socketIn,ChatClient client) throws Exception{
+    public ClientServerListener(Socket socketIn, ChatClient client, PrintStream visibleOut) throws Exception{
         this.socketIn = new BufferedReader(new InputStreamReader(socketIn.getInputStream()));
         this.client = client;
+        this.visibleOut = visibleOut;
     }
 
     @Override
@@ -20,36 +24,41 @@ public class ClientServerListener implements Runnable {
 
             while( (incoming = socketIn.readLine()) != null) {
 
+                //System.out.println("client server listener incoming: " + incoming);
+
                 if(incoming.startsWith("CHAT")){
-                    System.out.println(incoming.substring(4));
+                    visibleOut.println(incoming.substring(4));
                 }
                 else if(incoming.startsWith("PCHAT")) {
-                    System.out.println(incoming.substring(5));
+                    visibleOut.println(incoming.substring(5));
                 }
                 else if(incoming.startsWith("SERVER")){
-                    System.out.println("Server: " + incoming.substring(6));
+                    visibleOut.println("Server: " + incoming.substring(6));
                 }
                 else if(incoming.startsWith("KICK")){
-                    System.out.println("Server: A vote to kick user: "+incoming.substring(4) + " has begun. You have 30 seconds to vote yes (/y) or no (/n).");
+                    visibleOut.println("Server: A vote to kick user: "+incoming.substring(4) + " has begun. You have 30 seconds to vote yes (/y) or no (/n).");
                 }
                 else if(incoming.startsWith("SUBMITNAME")){
-                    System.out.print("Chat session has started - enter a user name: ");
+                    visibleOut.println("Chat session has started - enter a user name: ");
                    client.sendName();
                 }
                 else if(incoming.startsWith("WELCOME")){
-                    System.out.println(incoming.substring(7) + " has joined.");
+                    visibleOut.println(incoming.substring(7) + " has joined.");
                 }
                 else if(incoming.startsWith("ACCEPTED")){
                     client.nameReceived();
                 }
+                else if(incoming.startsWith("EXIT")){
+                    visibleOut.println(incoming.substring(4)+" has left.");
+                }
 
             }
         } catch (Exception ex) {
-            System.out.println("Exception caught in listener - " + ex);
+            visibleOut.println("Exception caught in listener - " + ex);
             ex.printStackTrace();
 
         } finally{
-            System.out.println("Client Listener exiting");
+            visibleOut.println("Client Listener exiting");
         }
     }
 }

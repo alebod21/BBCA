@@ -101,6 +101,14 @@ class ServerClientHandler implements Runnable{
             //notify all that client has joined
             broadcast(String.format("WELCOME %s", client.getUserName()));
 
+            String allNames = "CHATusers - ";
+            synchronized (ChatServer.clientList){
+                for(ClientConnectionData c : ChatServer.clientList){
+                    allNames += c.getUserName() + " ";}
+                }
+            broadcast(allNames);
+            client.getOut().println(allNames);
+
             String incoming = "";
 
             while( (incoming = in.readLine()) != null) {
@@ -186,6 +194,12 @@ class ServerClientHandler implements Runnable{
             }
             System.out.println(client.getName() + " has left.");
             broadcast(String.format("EXIT %s", client.getUserName()));
+            String allNames = "CHATusers - ";
+            synchronized (ChatServer.clientList){
+                for(ClientConnectionData c : ChatServer.clientList){
+                    allNames += c.getUserName() + " ";}
+            }
+            broadcast(allNames);
             try {
                 client.getSocket().close();
             } catch (IOException ex) {}

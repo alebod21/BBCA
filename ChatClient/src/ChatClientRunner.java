@@ -16,7 +16,7 @@ public class ChatClientRunner {
 
         try{
         client = new ChatClient(serverip,port,userInput);
-        client.startClient();}catch (Exception ex){
+        client.startClient(System.out);}catch (Exception ex){
             System.out.println(ex.getMessage());
             System.out.println(ex.getStackTrace());
         }

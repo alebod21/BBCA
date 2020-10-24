@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
@@ -15,10 +16,10 @@ public class ChatClient {
         userInput = userIn;
     }
 
-    public void startClient() throws Exception {
+    public void startClient(PrintStream visibleOut) throws Exception {
 
         // start a thread to listen for server messages
-        ClientServerListener listener = new ClientServerListener(socket,this);
+        ClientServerListener listener = new ClientServerListener(socket,this,visibleOut);
         Thread t = new Thread(listener);
         t.start();
 
