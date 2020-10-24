@@ -43,6 +43,9 @@ public class ChatClient {
             else if(line.startsWith("/ban") && line.length() > 5){
                 out.println("BAN"+line.substring(5));
             }
+            else if(line.startsWith("/whoishere")){
+                out.println("WHO");
+            }
 
             else{
             String msg = String.format("CHAT%s", line);

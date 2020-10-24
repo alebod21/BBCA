@@ -148,6 +148,15 @@ class ServerClientHandler implements Runnable{
                     }
                 }
 
+                else if(incoming.equals("WHO")){
+                    String names = "CHATusers - ";
+                    synchronized (ChatServer.clientList){
+                        for(ClientConnectionData c : ChatServer.clientList){
+                            names += c.getUserName() + " ";}
+                    }
+                    client.getOut().println(names);
+                }
+
                 else if(incoming.toUpperCase().startsWith("BAN") && incoming.length() > 3){
                     boolean nameexists = false;
 
