@@ -1,14 +1,17 @@
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -25,13 +28,17 @@ public class ChatClientGuiRunner extends Application{
     HBox messageArea = new HBox();
     TextField messageField = new TextField();
     Button sendButton= new Button("Send");
-    HBox userArea = new HBox();
-    TextArea userList = new TextArea();
+    TextArea userAreaText = new TextArea();
     TextArea chatText = new TextArea();
+    VBox userArea = new VBox();
+    HBox banBox = new HBox();
+    Button banButton = new Button("Ban");
+
+    public static final ObservableList<String> USERS = FXCollections.observableArrayList();
+    ComboBox userBox = new ComboBox(USERS);
 
 
-    private static final String USERS_HEADER = "               Users:     \n\n";
-    private static final ArrayList<String> USERS = new ArrayList<>();
+    private static final String USERS_HEADER = "               Users:               \n\n";
     private ChatClient client;
     public static final String SERVER_IP = "localhost";
     public static final int SERVER_PORT = 54321;
@@ -69,13 +76,26 @@ public class ChatClientGuiRunner extends Application{
                 messageField.setText("");
             }
         });
-        userArea.getChildren().add(userList);
+        userAreaText.setText(USERS_HEADER);
+        userAreaText.setMaxWidth(150);
+        banBox.getChildren().add(banButton);
+        banButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                messageWriter.println("/ban " + userBox.getValue());
+            }
+        });
+        userBox.setMaxWidth(115);
+        userBox.setPrefWidth(115);
 
+        banBox.getChildren().add(userBox);
         chatText.setEditable(false);
         chatText.setWrapText(true);
-        userList.setEditable(false);
-        userList.setPrefWidth(150);
-
+        userArea.getChildren().add(banBox);
+        userArea.getChildren().add(userAreaText);
+        userArea.setMaxWidth(150);
+        userAreaText.setPrefHeight(550);
+        userAreaText.setWrapText(true);
 
 
         layout.setBottom(messageArea);
@@ -88,7 +108,7 @@ public class ChatClientGuiRunner extends Application{
 
 
         //starting servery things
-        Thread chatBoxThread = new Thread(new TextFieldUpdater(chatText,userList,chatReader));
+        Thread chatBoxThread = new Thread(new TextFieldUpdater(chatText, userAreaText,chatReader));
         chatBoxThread.start();
         Thread IOThread = new Thread(new IORunner());
         IOThread.start();
@@ -129,23 +149,26 @@ public class ChatClientGuiRunner extends Application{
             while(incomingTextReader.hasNext()){
 
                 String incoming = incomingTextReader.nextLine();
-               // System.out.println(incoming);
-                area.appendText(incoming.strip() + "\n");
+
+                if(!incoming.startsWith("users - ")){
+                area.appendText(incoming.strip() + "\n");}
 
 
                 if(incoming.startsWith("users - ")){
                     users.setText(USERS_HEADER);
                     String[] newnames = incoming.split("\\s+");
-                    for(int i = 2; i < newnames.length; i++){
-                        users.appendText(newnames[i] + "\n");
-                    }
+                    USERS.clear();
 
+                    for(int i = 2; i < newnames.length; i++){
+                        USERS.add(newnames[i]);
+                        users.appendText(newnames[i]+"\n");
+                    }
                 }
             }
         }
-
     }
 }
+
 
 
 
