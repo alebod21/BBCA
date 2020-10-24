@@ -10,10 +10,12 @@ public class ChatClientRunner {
 
         //get IP and port from user
         System.out.println("What's the server IP? ");
-        String serverip = userInput.nextLine();
+        // String serverip = userInput.nextLine();
+        String serverip = "localhost";
         System.out.println("What's the server port? ");
-        int port = userInput.nextInt();
-        userInput.nextLine();
+        // int port = userInput.nextInt();
+        int port = 54321;
+        // userInput.nextLine();
         
         try{
         client = new ChatClient(serverip,port,userInput);

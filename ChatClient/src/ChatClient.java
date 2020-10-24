@@ -31,6 +31,7 @@ public class ChatClient {
 
         String line = userInput.nextLine().trim();
         while(!line.toLowerCase().startsWith("/quit")) {
+            // System.out.println(line);
 
             if(!serverAccepted){
                 // out.println(String.format("NAME%s",line));
@@ -57,12 +58,13 @@ public class ChatClient {
                 // out.println("WHO");
                 out.writeObject(new ChatMessage("WHO"));
             }
-
             else{
-            String msg = String.format("CHAT%s", line);
-            // out.println(msg);
-            out.writeObject(new ChatMessage(msg));
+                System.out.println("working good!");
+                String msg = String.format("CHAT%s", line);
+                // out.println(msg);
+                out.writeObject(new ChatMessage(msg));
             }
+            out.flush();
 
             line = userInput.nextLine().trim();
         }

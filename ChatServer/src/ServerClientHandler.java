@@ -83,8 +83,10 @@ class ServerClientHandler implements Runnable{
             boolean nameNotUsed;
 
             while (true){
+                // System.out.println("now we here");
                 // client.getOut().println("SUBMITNAME");
                 out.writeObject(new ChatMessage("SUBMITNAME"));
+                out.flush();
                 // userName = client.getInput().readLine();
                 userName = ((ChatMessage)in.readObject()).getMessage();
                 nameNotUsed = true;
@@ -127,7 +129,7 @@ class ServerClientHandler implements Runnable{
 
             String incoming = "";
 
-            while( (incoming = in.readLine()) != null) {
+            while( (incoming = ((ChatMessage)in.readObject()).getMessage()) != null) {
 
 
                 if(!ChatServer.voteInProgress)newVote();

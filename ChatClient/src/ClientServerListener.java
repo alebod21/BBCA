@@ -31,12 +31,11 @@ public class ClientServerListener implements Runnable {
             String incoming = null;
 
             // while( (incoming = socketIn.readLine() != null) {
-
-            System.out.println("look here stupid: " + ((ChatMessage)socketIn.readObject()).getMessage());
-            
             
             while ((incoming = ((ChatMessage) socketIn.readObject()).getMessage()) != null) {
                 System.out.println("bababooey");
+                System.out.println(incoming);
+                // System.out.println(((ChatMessage) socketIn.readObject()).getMessage());
 
                 // System.out.println("client server listener incoming: " + incoming);
 
@@ -64,8 +63,9 @@ public class ClientServerListener implements Runnable {
                 } else if (incoming.startsWith("EXIT")) {
                     visibleOut.println(incoming.substring(4)+" has left.");
                     // visibleOut.writeObject(new ChatMessage(incoming.substring(4) + " has left."));
-
                 }
+                incoming = ((ChatMessage) socketIn.readObject()).getMessage();
+                System.out.println(incoming);
 
             }
         } catch (Exception ex) {
