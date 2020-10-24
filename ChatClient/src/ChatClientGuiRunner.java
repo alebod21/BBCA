@@ -153,6 +153,25 @@ public class ChatClientGuiRunner extends Application{
                 if(!incoming.startsWith("users - ")){
                 area.appendText(incoming.strip() + "\n");}
 
+                if(incoming.endsWith("has left.") && !incoming.contains(":")){
+                    System.out.println("read someone left: " + incoming);
+                    System.out.println("Their name was: "+ incoming.split(" ")[1]);
+                    USERS.remove(incoming.split(" ")[1]);
+                    users.setText(USERS_HEADER);
+                    for(String name:USERS){
+                        users.appendText(name+"\n");
+                    }
+                }
+
+                if(incoming.endsWith("has joined.") && !incoming.contains(":")){
+                    System.out.println("read someone joined: " + incoming);
+                    USERS.add(incoming.split(" ")[0]);
+                    users.setText(USERS_HEADER);
+                    for(String name:USERS){
+                        users.appendText(name+"\n");
+                    }
+                }
+
 
                 if(incoming.startsWith("users - ")){
                     users.setText(USERS_HEADER);
