@@ -1,3 +1,4 @@
+import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
 public class ChatClientRunner {
@@ -13,7 +14,7 @@ public class ChatClientRunner {
         System.out.println("What's the server port? ");
         int port = userInput.nextInt();
         userInput.nextLine();
-
+        
         try{
         client = new ChatClient(serverip,port,userInput);
         client.startClient(System.out);}catch (Exception ex){
