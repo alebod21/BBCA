@@ -119,34 +119,34 @@ public class ChatClientGuiRunner extends Application{
     class IORunner implements Runnable{
 
         public void run(){
-//            chatText.appendText("What is the Server IP? \n");
-//            String IP = messageScanner.nextLine();
-//            chatText.appendText("What is the port?\n");
-//            int port = Integer.parseInt(messageScanner.nextLine());
+           chatText.appendText("What is the Server IP? \n");
+           String IP = messageScanner.nextLine();
+           chatText.appendText("What is the port?\n");
+           int port = Integer.parseInt(messageScanner.nextLine());
 
-//             try{
-//                 client = new ChatClient(SERVER_IP,SERVER_PORT, messageScanner);
-//                 client.startClient(chatWriter);}catch (Exception ex){
-//                 System.out.println(ex.getMessage());
-//                 System.out.println(ex.getStackTrace());
-//             }
-//         }
-//     }
+            try{
+                client = new ChatClient(SERVER_IP,SERVER_PORT, messageScanner);
+                client.startClient(chatWriter);}catch (Exception ex){
+                System.out.println(ex.getMessage());
+                System.out.println(ex.getStackTrace());
+            }
+        }
+    }
 
-//     class TextFieldUpdater implements Runnable{
+    class TextFieldUpdater implements Runnable{
 
-//         private TextArea area;
-//         private Scanner incomingTextReader;
-//         private TextArea users;
-//         private ArrayList<String> usernames = new ArrayList<>();
-//         public TextFieldUpdater(TextArea area, TextArea users, Scanner textReader) {
-//             this.area = area;
-//             incomingTextReader = textReader;
-//             this.users = users;
-//         }
+        private TextArea area;
+        private Scanner incomingTextReader;
+        private TextArea users;
+        private ArrayList<String> usernames = new ArrayList<>();
+        public TextFieldUpdater(TextArea area, TextArea users, Scanner textReader) {
+            this.area = area;
+            incomingTextReader = textReader;
+            this.users = users;
+        }
 
-//         public void run(){
-//             while(incomingTextReader.hasNext()){
+        public void run(){
+            while(incomingTextReader.hasNext()){
 
                 String incoming = incomingTextReader.nextLine();
 
