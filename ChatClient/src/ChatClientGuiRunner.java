@@ -18,7 +18,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-// public class ChatClientGuiRunner extends Application{
+public class ChatClientGuiRunner extends Application{
 
     public static void main(String[] args) {
         launch(args);
