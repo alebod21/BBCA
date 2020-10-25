@@ -103,7 +103,8 @@ class ServerClientHandler implements Runnable{
 
                     synchronized (ChatServer.clientList){
                     for(ClientConnectionData c : ChatServer.clientList){
-                        if(!c.equals(client) && c.getUserName().equals(userName)){nameNotUsed = false; break;}
+
+                        if((c.getUserName() != null) && !c.equals(client) && c.getUserName().equals(userName)){nameNotUsed = false; break;}
                     }}
                     if(nameNotUsed)break;
                 }
@@ -224,12 +225,14 @@ class ServerClientHandler implements Runnable{
             }
             System.out.println(client.getName() + " has left.");
             broadcast(String.format("EXIT %s", client.getUserName()));
-            String allNames = "CHATusers - ";
-            synchronized (ChatServer.clientList){
-                for(ClientConnectionData c : ChatServer.clientList){
-                    allNames += c.getUserName() + " ";}
-            }
-            broadcast(allNames);
+
+//            String allNames = "CHATusers - ";
+//            synchronized (ChatServer.clientList){
+//                for(ClientConnectionData c : ChatServer.clientList){
+//                    allNames += c.getUserName() + " ";}
+//            }
+//            broadcast(allNames);
+
             try {
                 client.getSocket().close();
             } catch (IOException ex) {}
