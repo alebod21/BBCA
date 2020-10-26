@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -7,13 +8,13 @@ import java.util.Scanner;
 
 public class ChatClient {
     private static Socket socket;
-    private static PrintWriter out;
+    private static ObjectOutputStream out;
     private Scanner userInput;
     private boolean serverAccepted;
 
     public ChatClient(String ip, int port, Scanner userIn) throws Exception{
         socket = new Socket(ip, port);
-        out = new PrintWriter(socket.getOutputStream(), true);
+        out = new ObjectOutputStream(socket.getOutputStream());
         userInput = userIn;
     }
 
@@ -29,7 +30,7 @@ public class ChatClient {
         while(!line.toLowerCase().startsWith("/quit")) {
 
             if(!serverAccepted){
-                out.println(String.format("NAME%s",line));
+                out.writeObject(new ChatMessage((String.format("NAME%s",line))));
             }
 
             //pchat
@@ -57,32 +58,32 @@ public class ChatClient {
 
                 for(String name : pchatNames){
                 String msg = String.format("PCHAT%s%s",name,message);
-                out.println("PCHAT"+ name+" " + message);
+                out.writeObject(new ChatMessage(("PCHAT"+ name+" " + message)));
                 }
             }
 
 
             else if(line.equals("/y")){
-                out.println("VOTEy");
+                out.writeObject(new ChatMessage(("VOTEy")));
             }
             else if(line.equals("/n")){
-                out.println("VOTEn");
+                out.writeObject(new ChatMessage(("VOTEn")));
             }
             else if(line.startsWith("/ban") && line.length() > 5){
-                out.println("BAN"+line.substring(5));
+                out.writeObject(new ChatMessage(("BAN"+line.substring(5))));
             }
             else if(line.startsWith("/whoishere")){
-                out.println("WHO");
+                out.writeObject(new ChatMessage(("WHO")));
             }
 
             else{
             String msg = String.format("CHAT%s", line);
-            out.println(msg);
+            out.writeObject(new ChatMessage((msg)));
             }
 
             line = userInput.nextLine().trim();
         }
-        out.println("QUIT");
+        out.writeObject(new ChatMessage(("QUIT")));
         out.close();
         userInput.close();
         socket.close();

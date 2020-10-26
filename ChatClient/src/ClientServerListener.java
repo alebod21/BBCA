@@ -1,18 +1,15 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class ClientServerListener implements Runnable {
-    private BufferedReader socketIn;
+    private ObjectInputStream socketIn;
     private ChatClient client;
     private PrintStream visibleOut;
 
 
 
     public ClientServerListener(Socket socketIn, ChatClient client, PrintStream visibleOut) throws Exception{
-        this.socketIn = new BufferedReader(new InputStreamReader(socketIn.getInputStream()));
+        this.socketIn = new ObjectInputStream(socketIn.getInputStream());
         this.client = client;
         this.visibleOut = visibleOut;
     }
@@ -22,9 +19,9 @@ public class ClientServerListener implements Runnable {
         try {
             String incoming = "";
 
-            while( (incoming = socketIn.readLine()) != null) {
+            while( (incoming = ((ChatMessage)(socketIn.readObject())).getMessage()) != null) {
 
-                //System.out.println("client server listener incoming: " + incoming);
+                System.out.println("client server listener incoming: " + incoming);
 
                 if(incoming.startsWith("CHAT")){
                     visibleOut.println(incoming.substring(4));

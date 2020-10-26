@@ -12,9 +12,8 @@ import java.io.PrintWriter;
 public class ChatServer {
     public static final int PORT = 54321;
     public static final ArrayList<ClientConnectionData> clientList = new ArrayList<>();
-    //private static final ArrayList<Integer> bannedIPs = new ArrayList<>();
     protected static final ArrayList<String> bannedNames = new ArrayList<>();
-    public static Boolean voteInProgress = new Boolean(false);
+    public static Boolean voteInProgress = Boolean.FALSE;
     public static Integer voteYes = 0;
     public static Integer voteNo = 0;
     public static ChatServer theServer;

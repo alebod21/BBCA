@@ -1,19 +1,17 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class ClientConnectionData {
     private Socket socket;
-    private BufferedReader input;
-    private PrintWriter out;
+    private ObjectInputStream input;
+    private ObjectOutputStream out;
     private String name;
     private String userName;
 
     public ClientConnectionData(Socket socket) throws Exception{
         this.socket = socket;
-        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.input = new ObjectInputStream(socket.getInputStream());
+        this.out = new ObjectOutputStream(socket.getOutputStream());
         this.name = socket.getInetAddress().getHostName();
     }
 
@@ -25,19 +23,19 @@ public class ClientConnectionData {
         this.socket = socket;
     }
 
-    public BufferedReader getInput() {
+    public ObjectInputStream getInput() {
         return input;
     }
 
-    public void setInput(BufferedReader input) {
+    public void setInput(ObjectInputStream input) {
         this.input = input;
     }
 
-    public PrintWriter getOut() {
+    public ObjectOutputStream getOut() {
         return out;
     }
 
-    public void setOut(PrintWriter out) {
+    public void setOut(ObjectOutputStream out) {
         this.out = out;
     }
 

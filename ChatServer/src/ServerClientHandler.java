@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.SocketException;
 
 class ServerClientHandler implements Runnable{
@@ -20,7 +21,7 @@ class ServerClientHandler implements Runnable{
             synchronized (ChatServer.clientList) {
                 for (ClientConnectionData c : ChatServer.clientList){
                     if(c.getUserName()!=null) {
-                        c.getOut().println(msg);
+                        c.getOut().writeObject(new ChatMessage((msg)));
                     }
                 }
             }
@@ -37,7 +38,7 @@ class ServerClientHandler implements Runnable{
                 for (ClientConnectionData c : ChatServer.clientList){
                     if(c.getUserName()==null || c.equals(client) && !msg.startsWith("WELCOME")) {
                     } else {
-                        c.getOut().println(msg);
+                        c.getOut().writeObject(new ChatMessage((msg)));
                     }
                 }
             }
@@ -53,7 +54,7 @@ class ServerClientHandler implements Runnable{
             synchronized (ChatServer.clientList) {
                 for(ClientConnectionData c : ChatServer.clientList) {
                     if(c.getUserName().equals(recipient)){
-                        c.getOut().println(msg);
+                        c.getOut().writeObject(new ChatMessage((msg)));
                     }
                 }
             }    
@@ -67,14 +68,13 @@ class ServerClientHandler implements Runnable{
     @Override
     public void run() {
         try {
-            BufferedReader in = client.getInput();
 
             String userName;
             boolean nameNotUsed;
 
             while (true){
-                client.getOut().println("SUBMITNAME");
-                userName = client.getInput().readLine();
+                client.getOut().writeObject(new ChatMessage(("SUBMITNAME")));
+                userName = ((ChatMessage)(client.getInput().readObject())).getMessage();
                 nameNotUsed = true;
 
                 //regex code borrowed from https://www.techiedelight.com/check-string-contains-alphanumeric-characters-java/
@@ -82,7 +82,7 @@ class ServerClientHandler implements Runnable{
                     userName = userName.substring(4);
 
                     if(ChatServer.bannedNames.contains(userName)){
-                        client.getOut().println("SERVERThat User has Been Banned.");
+                        client.getOut().writeObject(new ChatMessage(("SERVERThat User has Been Banned.")));
                         nameNotUsed = false;
                     }
 
@@ -97,7 +97,7 @@ class ServerClientHandler implements Runnable{
 
             //set client's username and notify client of acceptance
             client.setUserName(userName);
-            client.getOut().println("ACCEPTED");
+            client.getOut().writeObject(new ChatMessage(("ACCEPTED")));
             client.getOut().flush();
             //notify all that client has joined
             broadcast(String.format("WELCOME %s", client.getUserName()));
@@ -105,14 +105,15 @@ class ServerClientHandler implements Runnable{
             String allNames = "CHATusers - ";
             synchronized (ChatServer.clientList){
                 for(ClientConnectionData c : ChatServer.clientList){
+                    if(c.getUserName() != null)
                     allNames += c.getUserName() + " ";}
                 }
             broadcast(allNames);
-            client.getOut().println(allNames);
+            client.getOut().writeObject(new ChatMessage((allNames)));
 
             String incoming = "";
 
-            while( (incoming = in.readLine()) != null) {
+            while( (incoming = ((ChatMessage)(client.getInput().readObject())).getMessage()) != null) {
 
 
                 if(!ChatServer.voteInProgress)newVote();
@@ -153,9 +154,11 @@ class ServerClientHandler implements Runnable{
                     String names = "CHATusers - ";
                     synchronized (ChatServer.clientList){
                         for(ClientConnectionData c : ChatServer.clientList){
-                            names += c.getUserName() + " ";}
+                            if(c.getUserName() != null)
+                            names += c.getUserName() + " ";
+                        }
                     }
-                    client.getOut().println(names);
+                    client.getOut().writeObject(new ChatMessage((names)));
                 }
 
                 else if(incoming.toUpperCase().startsWith("BAN") && incoming.length() > 3){
@@ -171,10 +174,10 @@ class ServerClientHandler implements Runnable{
                     }
 
                     if(!nameexists){
-                        client.getOut().println("SERVERCannot vote to ban; user doesn't exist");
+                        client.getOut().writeObject(new ChatMessage(("SERVERCannot vote to ban; user doesn't exist")));
                     }
                     else if(ChatServer.voteInProgress){
-                        client.getOut().println("SERVERCannot vote to ban; vote already in progress.");
+                        client.getOut().writeObject(new ChatMessage(("SERVERCannot vote to ban; vote already in progress.")));
                     }
                     else{
                         publicBroadcast("KICK"+incoming.substring(3));
