@@ -11,6 +11,8 @@ public class ChatClient {
     private Scanner userInput;
     private boolean serverAccepted;
 
+    //this comment is here to create a delta and let me push
+
     public ChatClient(String ip, int port, Scanner userIn) throws Exception{
         socket = new Socket(ip, port);
         out = new PrintWriter(socket.getOutputStream(), true);
