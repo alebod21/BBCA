@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 public class ChatServer {
-    public static final int PORT = 54321;
+    public static final int PORT = 59010;
     public static final ArrayList<ClientConnectionData> clientList = new ArrayList<>();
     //private static final ArrayList<Integer> bannedIPs = new ArrayList<>();
     protected static final ArrayList<String> bannedNames = new ArrayList<>();
