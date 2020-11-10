@@ -18,6 +18,7 @@ public class ChatClient {
         userInput = userIn;
     }
 
+    //starts the client
     public void startClient(PrintStream visibleOut) throws Exception {
 
         // start a thread to listen for server messages
